@@ -1,0 +1,511 @@
+PAWCARE / WST262 SS3 – A1 TO E2 ANSWERS
+=====================================
+
+PROJECT NOTE
+------------
+The original SS3 rubric uses the Ward 42 Fix-It scenario. This project uses the equivalent PawCare
+clinic adaptation permitted for the project: “report” corresponds to “patient or visit record” and
+“resident” corresponds to “staff member” only where the rubric wording is adaptation-specific.
+The technical requirements, framework, database, security, media, PWA and documentation are implemented
+in the PawCare application.
+
+PART A: WEB SYSTEM ARCHITECTURE AND HTTP ANALYSIS
+
+A1: ARCHITECTURE DIAGRAM AND REQUEST FLOW
+
+Architecture:
+
+Resident/Staff Browser and PWA
+    |
+    | HTTPS for deployed use
+    | HTML, CSS, JavaScript, JSON, multipart/form-data
+    v
+Flask/Jinja Front Controller
+    |
+    +--> Jinja page routes: /, /directory, /visits, /reports
+    |         HTML + Bootstrap presentation
+    |
+    +--> JSON API routes: /api/patients, /api/visits,
+    |                     /api/reports/monthly, /api/reports/summary
+    |                     /api/uploads, /api/csrf-token
+    |         request validation and CSRF enforcement
+    |
+    +--> Service worker and browser cache
+    |
+    +--> SQLite database
+    |         patients <--> visits (foreign key)
+    |
+    +--> Instance uploads folder
+              uploaded JPEG, PNG and WebP files
+
+The analytics dashboard calls /api/reports/summary or /api/reports/monthly and receives JSON.
+The browser displays the response in summary cards, a chart and report rows. Static content
+(CSS, JavaScript, icons and media) is served over the same Flask application origin. A service
+worker caches the application shell, while API requests are deliberately not cached so that data
+is not silently read from an outdated offline copy.
+
+Five-step photo/report submission flow:
+
+1. The staff member or resident selects a photo and taps Submit. The browser performs immediate
+   JavaScript validation for selected type, extension and size and prepares a multipart/form-data
+   request containing the photo and/or form fields.
+
+2. For POST requests, the browser first obtains or already has the per-session CSRF token from
+   /api/csrf-token. It sends the photo to POST /api/uploads with the token in the X-CSRF-Token
+   header. The browser displays a saving state and disables the save control while the request is in
+   progress.
+
+3. Flask checks the CSRF token. It checks that a photo exists, that its MIME type is JPEG, PNG or
+   WebP, that the extension matches the MIME type, that the binary signature is valid and that the
+   file is not larger than 2 MB. It rejects the request with a field-like JSON error if a check fails.
+
+4. A valid photo receives a UUID-based secure_filename. Flask writes it to an uploads directory outside
+   templates. It returns a filename in JSON; the browser sends that filename with the patient/report
+   data in a JSON POST. Flask validates every field, performs a parameterised duplicate check, and
+   inserts the record and generated reference/ID using SQLite. SQLite stores only the photo filename/path,
+   not the image bytes. The service worker does not cache this API mutation.
+
+5. Flask returns HTTP 201 with the created record or an appropriate error JSON. JavaScript clears the
+   successful form state, clears the saved text draft, and displays the success alert or confirmation
+   page. For a lost connection, the browser retains the local text draft and the offline page remains
+   usable; clinical records and photos are never silently saved only in localStorage because that
+   would be unsafe for the clinic.
+
+Why SQLite/SQL suits this data:
+Table 1 contains structured fields, clear record relationships and constraints. SQL provides named
+fields, unique references, foreign keys and reliable queries such as reports by status or patient visits
+by date. The report/patient and visit relationship is therefore natural: one patient/report has many
+visits, and each visit refers to exactly one patient/report. Foreign keys enforce relationship integrity;
+indexes support category/status/date lookups. A relational schema also makes server validation, reporting
+and backup more predictable. NoSQL would allow less predictable field shapes, duplicating joins between
+reports/residents and statuses would be harder to enforce, and weak consistency could produce totals that
+do not match the underlying data. SQLite is especially suitable for a small departmental or community
+deployment with modest concurrent write volume.
+
+A2: HTTP ANALYSIS
+
+Capture procedure:
+1. Start Flask with:
+   .\.venv\Scripts\python.exe app.py
+   (flask run also works after activating the environment.)
+2. Open Chrome or Edge DevTools Network, enable “Preserve log”, open the application homepage, and
+   open the photo submission form for the POST.
+3. Submit valid fictitious test data and a valid JPEG, PNG or WebP photo, or use tests/api.http.
+4. Export/print each Network entry and save labelled screenshots in docs/screenshots.
+
+GET home-page request expected table:
+
+Field                    Home GET             GET /api/reports/summary example
+Method                   GET                  GET
+URL                      http://127.0.0.1:5000/
+Status                   200                  200
+Request Content-Type     Usually absent        Usually absent
+Response Content-Type    text/html; charset=utf-8 application/json
+Header example           Host                 Content-Type
+Header example           User-Agent           Cache-Control
+Purpose                  Receive an HTML page Receive JSON dashboard counts
+
+POST photo/report request expected table:
+
+Field                    Value
+Method                   POST
+URL                      http://127.0.0.1:5000/api/uploads
+Status                   201 on valid upload; 400 or 413 on invalid
+Request Content-Type     multipart/form-data; boundary=...
+Response Content-Type    application/json
+Header example           X-CSRF-Token
+Header example           Content-Length or Content-Type
+
+A valid photo request differs from the GET because GET has no request body and is intended to read
+the rendered page, while POST sends binary photo data and form metadata in a multipart body and
+mutates server state or creates a record. The POST response is JSON containing the generated filename
+for a successful upload. In PawCare, patient data is then posted separately as JSON after the upload.
+
+HTTPS is required when deployed because the report form contains names, cell numbers, addresses,
+descriptions and photos. HTTPS encrypts data in transit from the browser to the server, reduces the
+risk of traffic interception on public Wi-Fi, and prevents an active attacker from replacing HTML,
+JavaScript or API responses. The web origin also enables secure cookies and browser features used by
+a PWA. In Flask, the Secure cookie setting and HSTS/HTTPS mode can be enabled with production
+configuration rather than relying on plain HTTP.
+
+
+PART B: RESPONSIVE WEB APPLICATION WITH A FRAMEWORK
+
+B1: SEMANTIC, ACCESSIBLE AND RESPONSIVE FRONT END
+
+The shared [templates/base.html] uses template inheritance. Header, navigation, main, footer and
+section/article elements provide landmarks and document structure. The page title is specific to the
+view, headings follow a logical order, and navigation marks the current page.
+
+Bootstrap 5 provides the responsive grid, cards, forms, buttons, alerts, tables and navigation collapse.
+The layout has been checked at the equivalent evidence widths of 360/390 px for phones, 768 px for
+tablets and 1280 px for desktop. External [static/css/styles.css] contains the project media query and
+mobile touch-target rules. No required layout depends on inline styles.
+
+POUR measures implemented:
+• Perceivable: visible labels, descriptive alternatives, visible status messages, high contrast
+  Bootstrap/components and semantic table headings.
+• Operable: full keyboard navigation, native controls, visible focus, Escape/close support for dialogs,
+  horizontal table scrolling on narrow screens, and motion disabled for reduced-motion users.
+• Understandable: clear field instructions, immediate inline errors, consistent navigation and success
+  or failure feedback.
+• Robust: valid HTML structure, ARIA relationships for errors and live regions, and responsive Jinja
+  rendering tested through Flask.
+
+Screenshot evidence should include three pages at each required width:
+• Phone 360 or 390 px: Add Patient/Report form, Directory/All reports, Dashboard/Reports.
+• Tablet 768 px: the same three pages.
+• Desktop 1280 px: the same three pages.
+Suggested filenames can be expanded in docs/screenshots. Existing PawCare evidence includes
+pawcare-mobile-390.png and pawcare-desktop-1280.png.
+
+B2: FLASK BACK END, DATABASE AND DASHBOARD
+
+Database model:
+The PawCare model stores the application equivalent of Table 1 plus staff/visit fields:
+patients: id, pet_name, species, breed, dob, gender, neutered_spayed, owner_name, email, phone,
+photo_path
+visits: id, patient_id, date, time, visit_type, notes, staff_name
+
+SQLite creates patients and visits with a foreign key from visits.patient_id to patients.id. db.py
+initialises schema.sql, loads sample data, adds additive schema columns and closes connections.
+Server-generated IDs/reference values are returned rather than trusting the client for database identity.
+For a strict Fix-It implementation, reference would be a system-generated string such as W42-0153;
+the PawCare equivalent record ID is generated by SQLite and is not exposed as an authority-bearing value.
+
+Implemented routes:
+• GET / – home/form page
+• GET/POST API patient registration
+• GET patient and patient visit history
+• GET visits and POST visit
+• GET filtered monthly attendance
+• GET /api/reports/summary – dashboard JSON
+• Photo upload, photo retrieval and patient detail routes
+
+Filtering and status update concepts are available in the attendance/report implementation; category
+and status live filtering is handled by reports.js. A production Fix-It deployment should expose
+GET and PATCH/report routes for status changes and restrict coordinator pages to a login session.
+
+Coordinator protection:
+The application has staff-name protection, but there is not yet a full username/password account table.
+To satisfy the Fix-It requirement, implementation would require:
+1. Create a coordinators table with id, username, password_hash and optional role.
+2. Generate the hash with werkzeug.security.generate_password_hash, never pbkdf2/MS not plain text.
+3. Verify it with check_password_hash.
+4. Protect login-required routes by checking the Flask session.
+5. On status mutation, use POST/PATCH, CSRF validation and a server-side coordinator role check.
+6. Reject unauthenticated requests with 401 or 403 rather than exposing status controls.
+This is also the correct security boundary even though the current PawCare adaptation does not store
+coordinator passwords in plain text.
+
+Dashboard:
+The dashboard calculates patient, visit, today's visit and emergency/follow-up totals. The JSON endpoint
+returns counts rather than an HTML fragment. Category and status dashboard totals should be generated
+with GROUP BY queries in a Fix-It database. For current PawCare totals, example response:
+
+{
+  "patients": 6,
+  "visits": 30,
+  "todayVisits": 0,
+  "openCases": 10
+}
+
+B3: JAVASCRIPT INTERACTIVITY
+
+Description length and South African cell format validation are performed by DOM event handlers
+on external JavaScript files. The report/patient implementation validates required fields, length,
+name, date, email and phone. Phone validation accepts 10 digits starting with 0 or +27 followed
+by 9 digits; spaces are removed. The blur event validates a field when focus leaves it, while input
+events re-check fields already marked invalid.
+
+The All Reports/Attendance Reports page uses reports.js to read a selected category and status and
+filter table rows in the browser. The filter functions update rows, badges and summaries without
+making a server request. An invalid start/end order displays an error and does not update.
+
+Saved drafts:
+The external patient-form.js stores only non-sensitive report-style text such as pet/category, breed,
+description-related values and dob/species selections in localStorage under pawcare.patientDraft.
+It deliberately does not save owner/report name, email, phone/cell number or photo. These personal
+details are not stored in localStorage because the browser may be shared, localStorage persists until
+manually removed, JavaScript on the origin can read it, and it offers no POPIA-worthy confidentiality,
+expiry, encryption or server access controls. The draft is restored during DOMContentLoaded inside
+try/catch blocks, and form success calls clearDraft() by removing the localStorage key.
+The photo is not saved in localStorage because binary data would consume quota, may expose personal
+imagery, and is properly sent to the server upload endpoint only when the session is connected.
+
+Errors are handled with try/catch in localStorage operations, API calls and upload operations.
+Unexpected errors are logged with console.error and the user receives a friendly visible alert.
+User-entered text is inserted with textContent or normal controlled DOM properties, not untrusted
+innerHTML.
+
+
+PART C: MOBILE DELIVERY AS A PROGRESSIVE WEB APP
+
+C1: PWA CONVERSION
+
+Manifest:
+static/manifest.webmanifest contains:
+• name: PawCare Clinic Administration
+• short_name: PawCare
+• start_url: /
+• scope: /
+• display: standalone
+• theme_color: #4f46e5
+• background_color: #f8fafc
+• 192 px and 512 px PNG icons, including a maskable 512 px icon
+• description
+
+Service worker:
+static/js/sw.js is served as /sw.js and registered by the application layout. CACHE_NAME is
+pawcare-shell-v2. It caches the home and navigation shell, Bootstrap CSS, application JavaScript,
+icons, tutorial MP4/WebM and captions. Navigation fetches first, then falls back to a cached page or
+the custom /offline route if the network is unavailable. GET static requests are cache-first. Mutating
+and /api/* requests bypass service-worker caching.
+
+The custom offline page tells the resident that PawCare cannot reach the server and that previously
+opened pages may still be available. Installation and offline behaviour are verified with Chrome
+DevTools Application and Network panels. Installation evidence should show the manifest and service
+worker registered and the install button. Offline evidence should show DevTools Network set offline
+and the custom offline page rendered.
+
+C2: MULTI-DEVICE USABILITY AND EFFICIENCY
+
+Minimum device matrix:
+
+Environment       Browser                   Screen width  Area tested          Problem/fix
+Phone emulation   Chrome mobile mode        360 or 390 px  Patient/report form  Added 44 px controls and full-width actions
+Tablet browser    Chrome responsive mode    768 px        Form/grid/navigation Reflowed Bootstrap columns
+Desktop browser   Chrome                    1280 px       Reports/dashboard    Maintained desktop columns and table overflow
+
+Current usability evidence includes PawCare screenshots at 390 px and 1280 px and a Lighthouse mobile
+JSON result. Two genuinely different physical devices should still be used for final submission if
+one can be borrowed/tested; each row must record device model, browser and real viewport.
+
+PawCare Lighthouse mobile results documented in docs/c2-usability.md:
+• Performance: 92
+• Accessibility: 100
+• Best Practices: 100
+• SEO: 90
+
+Three specific data-saving measures:
+1. Load page-specific libraries only when needed. React is loaded only in the Patient Directory and
+   Chart.js/video code is not downloaded by every page. This reduces JavaScript and bandwidth.
+2. Use cached static application assets and a service worker. CSS, JavaScript, icons, pages and media
+   already downloaded by the PWA are reused instead of repeatedly using prepaid mobile data.
+3. Keep the MP4 and WebM tutorial sources short and deliver captions separately as a small WebVTT
+   file. The browser can choose a supported source, while compressed text is loaded only for captions.
+   Further savings would include not autoplaying video, lazy-loading the tutorial, using responsive
+   image thumbnails, and avoiding loading React or Chart.js on unrelated pages.
+
+
+PART D: SECURITY ANALYSIS AND CORRECTION
+
+D1: VULNERABILITY ANALYSIS OF app_v1.py
+
+Line 6 — Hard-coded weak secret key.
+Attack: anyone who sees the source knows "ward42". If it is used to sign a coordinator session,
+an attacker can forge or modify a cookie and impersonate a coordinator, exposing names, cells and
+report details or closing reports.
+Correction:
+  app.secret_key = os.environ["FIXIT_SECRET_KEY"]
+Use a random secret generated with secrets.token_hex(32) and set it outside source control.
+Why it works: guessing or reading source no longer reveals the signing secret; the Flask session is
+only valid when signed with the deployment secret.
+
+Lines 13-14 — SQL injection.
+Attack: /search?street=X%27%20OR%201=1-- changes the SQL condition so every report may be returned,
+disclosing streets, resident details or report statuses.
+Correction:
+  street = request.args.get("street", "").strip()
+  rows = sqlite3.connect("fixit.db").execute(
+      "SELECT id, category, status FROM reports WHERE street = ?",
+      (street,)
+  ).fetchall()
+Why it works: the ? placeholder treats the attacker value as data, not executable SQL structure.
+
+Lines 16-19 — Reflected XSS and dynamic template injection.
+Attack: /search?street=<script>fetch('/report/153')</script> can execute JavaScript in a victim's
+browser or expose/modify report data. The dynamic render_template_string makes that code more
+dangerous by accepting template syntax as well as HTML.
+Correction:
+  from flask import render_template
+  return render_template("search.html", street=street, rows=rows)
+  Template: <h2>Reports for {{ street }}</h2>; display rows with {{ row.field }}.
+Why it works: a static template and Jinja autoescaping convert HTML/script characters into text.
+Untrusted input is never compiled as a template.
+
+Lines 21-28 — Missing authentication and authorization and unsafe GET state change.
+Attack: any visitor opens /report/153/close. A malicious website can also embed a link or image to
+change status. This hides an unresolved fault and manipulates report integrity.
+Correction:
+  @app.route("/report/<int:report_id>/close", methods=["POST"])
+  @require_coordinator
+  def close_report(report_id):
+      if not secrets.compare_digest(
+          request.form.get("csrf_token", ""), session["csrf_token"]
+      ):
+          abort(403)
+      conn.execute(
+          "UPDATE reports SET status = 'Closed' WHERE id = ?",
+          (report_id,),
+      )
+      conn.commit()
+Why it works: authentication limits the action to a coordinator, POST removes simple image/link
+triggers, and CSRF proves that the request came from the logged-in user's session form.
+
+Lines 30-33 — Path traversal and unrestricted upload.
+Attack: filename ../../fixit.db or a Windows traversal name can attempt to write outside uploads or
+overwrite application data when saved. An executable or disguised HTML file may also be served later.
+Correction:
+  filename = secure_filename(photo.filename)
+  filename = f"{uuid.uuid4().hex}{Path(filename).suffix.lower()}"
+  photo.save(UPLOAD_DIR / filename)
+Add MIME, extension, binary signature and 2 MB checks.
+Why it works: traversal characters and caller-controlled base names are removed; a UUID prevents
+collisions and makes destination selection impossible. Content checks prevent unsupported files.
+
+Lines 36-37 — Debug mode enabled in production.
+Attack: an invalid query or upload error exposes source code, local variables, configuration and an
+interactive debugger. In debugger-enabled deployments this can lead to secret disclosure or
+remote command execution.
+Correction:
+  app.config.update(
+      DEBUG=False,
+      SESSION_COOKIE_SECURE=True,
+      SESSION_COOKIE_HTTPONLY=True,
+      SESSION_COOKIE_SAMESITE="Lax",
+  )
+  app.run(host="127.0.0.1", debug=False, use_reloader=False)
+Deploy with a WSGI server behind HTTPS.
+Why it works: debug traces and an interactive console are disabled and secure session flags reduce
+cookie theft.
+
+Lines 10-19 also lack input validation.
+Attack: very long street strings can consume resources or affect rendering/logging. Unexpected
+special characters may be used in injection attempts.
+Correction: trim, require a bounded length such as 100 characters, and check an allowed character
+pattern before database and template handling.
+Why it works: server validation rejects unsupported values before database or presentation logic.
+
+POPIA impact:
+SQL injection, XSS and missing authorization are the most serious combination because they can
+disclose or manipulate street, name, cell number, description, photo and status data in unauthorized
+ways. Unauthorized disclosure can breach POPIA confidentiality and security safeguards, while
+unauthorized status changes damage accuracy, accountability and the resident's right to reliable
+information. Debug disclosures and insecure uploads increase the likelihood and scope of further
+unauthorized processing. The association should limit collection, access and retention, require
+access control, use encrypted transport and keep audit logs for changes.
+
+D2: SECURING OUR OWN APPLICATION
+
+1. Server-side validation:
+app.py calls validate_patient and validate_visit before a database write. validators.py applies
+required values, allowed species and visit types, length limits, valid dates, and South African phone
+rules. A 400 response returns {"error": "Validation failed.", "errors": {...}}. Browser validation is
+advisory; direct API clients are rejected using the same rules.
+
+2. Parameterised queries:
+Every user-controlled SQLite query uses ? placeholders and separate arguments. Examples include
+patient lookup, duplicate checking, visit patient lookup, date filters and photo lookup. No SQL
+string joins request values.
+
+3. CSRF:
+A per-session random token is created in ensure_csrf_token. /api/csrf-token returns it for JavaScript.
+Mutating API requests send X-CSRF-Token, and app.py rejects missing or mismatched tokens with HTTP
+403 using secrets.compare_digest. POST, PUT, PATCH and DELETE mutations are covered.
+
+4. Session and header settings:
+Secure cookie settings:
+• HttpOnly=True
+• SameSite=Lax
+• Secure=True in HTTPS mode
+• Environment-provided PAWCARE_SECRET_KEY, not a source-code key
+
+Response headers include:
+• Content-Security-Policy with default-src 'self'
+• X-Content-Type-Options: nosniff
+• X-Frame-Options: DENY
+• Referrer-Policy
+• Permissions-Policy
+
+5. security_tests.http:
+At least four test requests attempt:
+• SQL injection-shaped input
+• Script/XSS-shaped input
+• Patient POST without a CSRF token
+• Invalid text/plain or non-image upload
+
+The automated security test rejects missing CSRF, malformed SQL-shaped and script-shaped values,
+invalid uploads, then verifies valid CSRF and valid upload behavior plus security headers.
+Evidence should contain four screenshots: missing-CSRF 403, SQL injection/XSS 400, invalid upload 400
+and security headers in the response pane. The project also must show the JSON/HTTP response, not only
+the absence of a crash.
+
+
+PART E: DIGITAL MEDIA STORAGE, TRANSFER AND RETRIEVAL
+
+E1: SECURE PHOTO UPLOAD AND RETRIEVAL
+
+Client and server validation:
+The browser accepts JPEG, PNG and WebP, previews the selected image and rejects files above 2 MB.
+POST /api/uploads is authoritative and enforces:
+1. photo field exists;
+2. filename exists;
+3. MIME type is image/jpeg, image/png or image/webp;
+4. extension matches the MIME type;
+5. binary signature matches the content type;
+6. file size is 2 MB or less.
+
+Storage:
+uploaded filenames are made with a UUID plus the approved extension. secure_filename and a resolved
+uploads directory prevent caller-selected paths and traversal. Files are stored outside templates under
+the Flask instance uploads directory. SQLite stores only photo_path/filename in patients.photo_path.
+The patient directory displays a thumbnail loaded from
+/api/patients/<id>/photo; the detail page uses the full image from the same route with descriptive
+alt text such as “Full photo of Bella”.
+
+Why file storage is better:
+Photos are large binary objects, so storing bytes in SQLite would increase database backup size,
+cache/transaction cost and row transfer time. A filesystem file can be streamed directly, cached,
+thumbnails or transformations can be produced later, and ordinary patient queries remain small. The
+database records only one small path/filename, retaining the relationship with the patient/report
+without duplicating binary data. Backups should include database and uploads, and production storage
+must enforce private permissions and access checks.
+
+E2: JSON API, VIDEO AND FORMAT CHOICES
+
+JSON dashboard API:
+GET /api/reports/summary is read-only and returns:
+
+{
+  "patients": 6,
+  "visits": 30,
+  "todayVisits": 0,
+  "openCases": 10
+}
+
+The Dashboard/Attendance Reports page uses fetch() through static/js/api.js, an async function reads
+response.json(), verifies response.ok, and updates cards or chart values. A failed Fetch is caught and
+a user-friendly error is displayed instead of silently showing fake values. The raw JSON response is
+captured from the browser Network or http://127.0.0.1:5000/api/reports/summary.
+
+Video:
+templates/index.html uses:
+• HTML5 <video>
+• MP4 source at /static/video/pawcare-tutorial.mp4
+• WebM source at /static/video/pawcare-tutorial.webm
+• a WebVTT track at /static/video/pawcare-tutorial.vtt with kind="captions",
+  srclang="en" and a default English option
+
+The browser chooses the first supported source. Captions are separate rather than burned into the
+video so viewers can turn them on/off and the text remains accessible.
+
+Format choices:
+
+Data/format | Choice | Alternative | Size | Browser support | Why
+Dashboard data | JSON | XML | JSON has lower syntax overhead and is compact | Native in JavaScript | Fetch/Flask parse JSON directly
+Photos | JPEG, PNG, WebP | BMP or DB binary | JPEG/WebP are compact; PNG lossless | Modern browsers support all three | JPEG suits photos, WebP efficient, PNG supports detail
+Video | MP4 + WebM | AVI or HLS | MP4/WebM are practical web formats | MP4 has broad support; WebM has broad modern browser support | Two sources provide fallback without HLS infrastructure
+Accessibility text | WebVTT | SRT/burned captions | Small plain text | Native HTML5 video track support | WebVTT can be styled and toggled
+
+END OF A1–E2 ANSWERS

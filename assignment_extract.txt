@@ -1,0 +1,817 @@
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 1 of 16 
+ 
+SCHOOL OF Information Technology 
+Assignment Code SS2 
+Assignment Type Project 
+Individual Assignment 
+Total Marks 100 
+ 
+Module Name Web Systems and Technologies 
+Module Code WST262 
+ 
+- Consult Canvas for the due dates, the Assessment Guidelines for Students document, the 
+Assignment Overview, and other updated detail. Check the Announcements by your lecturer 
+and use the Module Q&A forum to ask questions related to this assignment. 
+- For rules and regulations applicable to assessments, refer to the Student Handbook.  
+- Note STADIO’s rules relating to plagiarism and cheating. Do not hesitate to seek help if you 
+are unsure of how to reference your sources. Make use of the STADIO Referencing Guide, 
+available from myLibrary. 
+ 
+INTRODUCTION 
+In SS1 you started building a website which we are now calling “PawCare” in this assessment,  that 
+helps a local pet clinic replace its paper attendance register. You created the static patient and 
+report pages (Phase 1) and added a Chart.js chart with random test data (Phase 2)  using Java 
+Script . 
+The clinic has reviewed your prototype and now wants a working system. Staff must be able to 
+register patients and record visits on any device, the attendance register and chart must show real 
+data, and all records must be stored centrally so that every st aff member sees the same 
+information. 
+In SS2 you will continue with the same project through Phases 3 to 7. You will turn the prototype 
+into a full-stack web application using Bootstrap, JavaScript, client-side storage, a Flask REST API 
+with an SQLite database, and React. By the end of SS2 the  application will have the following 
+pages: 
+Add Patient (index.html) 
+- Captures and validates pet and owner details, and saves them. 
+- Button or link to navigate to Attendance Reports. 
+Record Visit (visits.html) – new 
+- Captures a patient’s attendance: patient, visit date, visit type and notes. 
+Attendance Reports (reports.html) 
+- Displays the patients who attended the clinic in the selected period, using real data.  
+- Uses Chart.js to show the number of visits per month in the selected period. 
+Patient Directory (directory.html) – new 
+- A React page for searching patients and viewing each patient’s visit history. 
+
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 2 of 16 
+Below are examples of how the finished pages could look. As in SS1, you may be creative and 
+adapt the design, but these are the minimum elements required. 
+ 
+Example: Record Visit page (desktop) 
+ 
+Example: Attendance Reports page with a date filter and data from the database 
+ 
+Example: monthly summary chart generated from recorded visits 
+
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 3 of 16 
+ 
+Example: React Patient Directory with a patient’s visit history 
+The complete instructions follow below. 
+OVERVIEW 
+The application is developed incrementally over 7 (seven) phases. Phases 1 and 2 were 
+submitted in SS1. Phases 3 to 7 are submitted in SS2. SS3 will be a separate project in which 
+the all the concepts learned in this semester will be assessed. 
+Completed in SS1 
+Phase Title/ Description Submission format Marks 
+Phase 1 Static html & css files only Zip file with all source 
+code 
+40 
+Phase 2 JavaScript added to generate random test data Zip file with all source 
+code 
+40 
+ 
+
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 4 of 16 
+To be submitted in SS2 
+Phase  Description Submission format Marks 
+Phase 3 Responsive design with Bootstrap Zip file with all source code and 
+screenshots 
+15 
+Phase 4 JavaScript interactivity and form validation Zip file with all source code and 
+screenshots 
+15 
+Phase 5 Client-side storage and dynamic reports Zip file with all source code and 
+written analysis 
+20 
+Phase 6 Web system architecture: Flask REST API and 
+SQLite database 
+Zip file with all source code and 
+documentation 
+25 
+Phase 7 React front end: Patient Directory Zip file with all source code, 
+documentation and reflection 
+20 
+All Project structure, README and demonstration 
+video 
+README and video in the Phase 
+7 zip file 
+5 
+Total   100 
+ 
+WEBSITE DATA REQUIREMENTS 
+The following rules apply from Phase 4 onwards. They must be checked in the browser (Phases 
+4–5) and again on the server (Phases 6–7). 
+Field Required Rule 
+Patient 
+Pet name Yes 2–40 characters: letters, spaces, hyphens and apostrophes; must 
+start with a letter. 
+Species Yes One of: Dog, Cat, Rabbit, Bird, Other. 
+Breed No Maximum 40 characters. 
+Date of birth No A valid date that is not in the future. 
+Gender and 
+neutered/spayed 
+Yes Gender: Male or Female. Neutered/spayed: yes or no (checkbox). 
+Owner full name Yes 2–60 characters: letters, spaces, hyphens and apostrophes. 
+Email address Yes A valid email format, e.g. name@example.co.za. 
+Phone number Yes A South African number: 10 digits starting with 0 (e.g. 082 123 
+4567), or +27 followed by 9 digits. Spaces may be typed but 
+must be removed before saving. 
+Duplicates – The same pet name (not case-sensitive) may not be registered 
+twice for the same owner email address. 
+Visit 
+Patient Yes Must be an existing patient. 
+Visit date Yes A valid date that is not in the future. 
+Visit type Yes One of: Annual checkup, Vaccination booster, Surgery follow-up, 
+Spay/Neuter, Consultation, Emergency. 
+Notes No Maximum 200 characters. 
+Captured by Yes The staff member’s name, taken from the staff-name cookie (from 
+Phase 5). 
+ 
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 5 of 16 
+ARTIFICIAL INTELLIGENCE TRAFFIC LIGHT MATRIX (AITLM) 
+ RED AMBER GREEN  
+Question/ Part May NOT 
+use AI 
+May 
+use AI 
+MUST 
+use AI 
+Details of AI use 
+All phases 
+ 
+● 
+ You may use AI to explain concepts, but you may not 
+use AI to generate code, documentation, diagrams or 
+reflections, and neither may you copy and paste code 
+fragments directly from any source. 
+ 
+Keep record of all prompts to AI and its responses as 
+you might be asked afterwards to provide evidence of 
+such actions. 
+NOTE: 
+•  STADIO employs AI writing detection tools to monitor AI use. 
+•  Presenting work produced by AI as your own contravenes the STADIO Plagiarism policy. 
+•  Refer to the STADIO Referencing Guide for guidance. 
+ 
+Phase 3 (Responsive design with Bootstrap) (15 marks) 
+ 
+INSTRUCTIONS 
+Start from a copy of your Phase 2 files; do not overwrite your SS1 work. These files must be zipped 
+together in a single zip file named WST262_S2_26_SS2_Ph3_<surname>.zip: 
+- index.html, visits.html (new), reports.html 
+- css/styles.css 
+- js/chart.js (your Phase 2 file, moved into the js folder) 
+- docs/ – screenshots (see instruction 9) 
+ 
+1. Link Bootstrap 5.3 to every page (see the hints) and use Bootstrap’s grid, form, button, card 
+and table classes to lay out the pages. Do not copy complete Bootstrap example pages. 
+2. Add the same responsive navigation bar to all pages, with the brand name PawCare and links 
+to Add Patient, Record Visit and Attendance Reports. On screens narrower than 768 px the 
+links must collapse into a menu button. Highlight the current page with the active class and 
+aria-current="page". 
+3. index.html: place Pet Information and Owner Information side by side on medium and larger 
+screens, and stacked on phones. Every input needs a <label> linked with for/id, required 
+fields must be marked, and suitable input types must be used ( email, tel, date). Put the 
+gender radio buttons in a <fieldset> with a <legend>, and add a Neutered / spayed checkbox. 
+4. visits.html (new): create a Record Clinic Visit form with Patient (select list containing at least 
+the four patients from the SS1 register), Visit Date, Visit Type (select list with the six types 
+in the data requirements) and Notes (textarea), plus Cancel and Save Visit buttons. 
+5. reports.html: place the start and end date inputs in a responsive row, put the attendance 
+table inside a Bootstrap .table-responsive container, show each visit type as a coloured 
+badge, and place the chart in a card. The Phase 2 random chart must still work. 
+6. Use semantic HTML5 on every page: <header>, <nav>, <main>, <section> and <footer>, exactly 
+one <h1> per page and a logical heading order. 
+7. In styles.css, define CSS custom properties (variables) for the clinic’s colours and use them, 
+and add at least one media query that changes the layout on screens narrower than 576 px 
+(for example, full-width buttons or a shorter chart). 
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 6 of 16 
+8. Remove all inline style attributes. Move the 380 px chart height from Phase 2 into a CSS 
+class. 
+9. Validate every page with the W3C Markup Validation Service and fix all errors. In the docs 
+folder, include screenshots of the validation results and of each page at a width of 390 px 
+(phone) and 1280 px (desktop). Use the device toolbar in your browser’s DevTools. 
+ 
+Example: navigation menu expanded on a 390 px wide screen (final application) 
+ 
+  
+
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 7 of 16 
+Phase 4 (JavaScript interactivity and validation) (15 marks) 
+ 
+INSTRUCTIONS 
+Start from a copy of your Phase 3 files. Zip all files into WST262_S2_26_SS2_Ph4_<surname>.zip. Add 
+the following files: 
+- js/validation.js – the validation rules 
+- js/patient-form.js – event handling for index.html 
+- js/visit-form.js – event handling for visits.html 
+- docs/ – debugging screenshots (see instruction 8) 
+ 
+1. Place all JavaScript in external files, linked at the end of <body> (or with defer). Do not use 
+inline event attributes such as onclick or onsubmit; use addEventListener instead. 
+2. In validation.js, write one function per field rule (or an object of rule functions) that returns 
+an error message, or an empty string when the value is valid. Implement every patient and 
+visit rule in the PawCare (Website) data requirements and use the same functions in both 
+forms. 
+3. index.html: when the form is submitted, prevent the default submission and validate all 
+fields. Show each message below its field using Bootstrap’s is-invalid and invalid-feedback 
+classes, and move the focus to the first invalid field. Also validate a field when the user 
+leaves it (blur) and check it again while typing once an error is showing. 
+4. When a date of birth is selected, display the pet’s age below the field, for example “Age: 3 
+years, 4 months”. 
+5. When the patient form is valid, create a JavaScript object for the patient, log it with 
+console.log, show a Bootstrap success alert naming the pet and owner, and reset the form. 
+The Cancel button must also clear all messages. 
+6. visits.html: build the Patient dropdown from a JavaScript array of patient objects using the 
+DOM (not options typed in the HTML). Default the visit date to today and prevent future 
+dates. Show a live character counter for the notes (e.g. “42 / 200”). Validate the form on 
+submit in the same way as the patient form. 
+7. Use try...catch around the code that processes a valid form. Log unexpected errors with 
+console.error and show a friendly message to the user. Insert any text the user typed with 
+textContent, not innerHTML. 
+8. In the docs folder, include a screenshot of the browser DevTools paused at a breakpoint 
+inside your submit handler, and a screenshot of the Console showing a logged patient 
+object. 
+  
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 8 of 16 
+Phase 5 (Client-side storage and dynamic reports) (20 marks) 
+ 
+INSTRUCTIONS 
+Start from a copy of your Phase 4 files. Zip all files into WST262_S2_26_SS2_Ph5_<surname>.zip. Add 
+or change the following files: 
+- js/storage.js – functions that read and write data in localStorage 
+- js/seed-data.js – sample data 
+- js/cookies.js – functions to set and read cookies 
+- js/reports.js – replaces js/chart.js 
+- docs/storage-analysis.pdf (or .md) – written analysis (instruction 9) 
+ 
+1. In storage.js, write functions that store patients and visits as JSON arrays in localStorage, 
+for example getPatients(), addPatient(), getVisits(start, end), addVisit() and 
+getMonthlySummary(start, end). Use JSON.stringify and JSON.parse, and use try...catch so 
+that corrupted stored data does not crash the pages. 
+2. In seed-data.js, create sample data that is loaded into localStorage only the first time the 
+application runs: at least 6 patients and at least 30 visits spread over at least 6 months. 
+3. The patient form must save new patients with a unique id and must reject duplicates (see 
+the data requirements) with a warning alert. 
+4. The Patient dropdown on visits.html must now be built from the stored patients, and each 
+saved visit must store the patient id and the staff member’s name. 
+5. Allow staff to enter their name (e.g. a navbar button that opens a small form or modal). 
+Store it in a cookie named staffName that expires after 30 days, with path=/ and 
+SameSite=Lax. Show the name on every page, and do not allow a visit to be saved until a 
+name has been set. 
+6. reports.html: build the table rows with the DOM from the stored visits in the selected 
+period, newest first, showing the date, “pet name – species”, owner and a visit-type badge. 
+Show a summary such as “26 visits between 2026/06/01 and 2026/08/31”. “View All” must 
+clear the filter. If the start date is after the end date, show a message and do not update 
+the report. 
+7. Replace the random chart data: the chart must show the number of visits per month in the 
+selected period, including months with no visits. When the dates change, update the 
+existing chart with chart.update() instead of creating a new chart. 
+8. Use sessionStorage to remember the last selected start and end dates, so that the filter is 
+restored when the page is reloaded in the same browser tab. 
+9. Storage analysis (300–400 words): compare cookies, localStorage and sessionStorage in 
+terms of capacity, lifetime, scope and whether the data is sent to the server, and justify 
+where you used each one in PawCare. Then evaluate why localStorage is not appropriate 
+for storing patient and owner records in a real clinic, giving at least three reasons. 
+Reference your sources using the STADIO Referencing Guide. 
+ 
+Phase 6 (Web system architecture: Flask REST API and database) (25 marks) 
+ 
+INSTRUCTIONS 
+In this phase you move PawCare from the browser to a web system with a front end, a back end, 
+an API and a database (Study Guide Topic 3). Start from a copy of your Phase 5 files and use the 
+folder structure below. Zip the project into WST262_S2_26_SS2_Ph6_<surname>.zip. Do not include 
+your virtual environment (.venv) or __pycache__ folders. 
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 9 of 16 
+Required folder structure 
+pawcare/ 
+├── app.py              Flask application: page routes and REST API 
+├── db.py               database connection and set-up 
+├── validators.py       server-side validation rules 
+├── schema.sql          CREATE TABLE statements 
+├── requirements.txt 
+├── README.md 
+├── templates/          base.html, index.html, visits.html, reports.html 
+├── static/css/         styles.css 
+├── static/js/          api.js, validation.js, cookies.js, common.js, 
+│                       patient-form.js, visit-form.js, reports.js 
+├── tests/              api.http (VS Code REST Client) or a Postman collection 
+└── docs/               architecture.png, API.md, test screenshots 
+ 
+1. Create a Flask application that serves the pages from Jinja templates. Place the shared 
+layout (navbar, footer and staff-name dialog) in base.html and use template inheritance ({% 
+extends %} and {% block %}). Link CSS and JavaScript with url_for('static', ...). 
+2. Create an SQLite database with a patients table and a visits table, where 
+visits.patient_id is a foreign key to patients.id. Provide schema.sql and a command or 
+script that creates the database and loads your sample data. 
+3. Implement the following REST API endpoints. All endpoints must return JSON and the 
+status codes shown: 
+Method URL Purpose Status codes 
+GET /api/patients List all patients 200 
+POST /api/patients Register a patient 201, 400, 409 
+(duplicate) 
+GET /api/patients/<id> One patient 200, 404 
+GET /api/visits?start=&end= Visits in a period (both parameters 
+optional), newest first, including pet 
+name, species and owner 
+200, 400 (invalid dates 
+or start after end) 
+POST /api/visits Record a visit 201, 400, 404 (patient 
+not found) 
+GET /api/reports/monthly?start=&end
+= 
+Visits per month, e.g. [{"month": 
+"2026-06", "visits": 7}], including 
+months with no visits 
+200, 400 
+ 
+4. Validate all POST data on the server using the PawCare data requirements. A 400 response 
+must include a message for each invalid field, for example {"error": "Validation failed.", 
+"errors": {"petName": "..."}}. 
+5. Every SQL statement must use parameterised queries (? placeholders). Never build SQL by 
+joining strings that contain user input. 
+6. Front end: replace storage.js with api.js, which uses fetch() with async/await for all data. 
+Show the server’s field errors under the correct inputs, show a friendly message if the 
+server cannot be reached, and disable the Save button while a request is in progress. The 
+staff-name cookie and the sessionStorage filter must still work. 
+7. docs/architecture.png: draw a diagram of the PawCare web system that shows the front 
+end, back end, API and database with the technologies used in each. Add numbered steps 
+that show what happens from the moment staff click “Save Patient File” until the success 
+message appears. 
+8. docs/API.md: document every endpoint (method, URL, request body or parameters, status 
+codes and an example response). In API.md or README.md, explain in 150–250 words why 
+PawCare validates data both in the browser and on the server. 
+9. tests: test every endpoint with the VS Code REST Client (api.http) or Postman, including at 
+least three requests that should fail (invalid data, invalid date range and a patient that does 
+not exist). Include screenshots of the responses in the docs folder. 
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 10 of 16 
+10. README.md: explain how to install the requirements, create the database and run the 
+application. 
+  
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 11 of 16 
+Phase 7 (React front end: Patient Directory) (20 marks) 
+ 
+INSTRUCTIONS 
+Start from a copy of your Phase 6 project. Zip the project into WST262_S2_26_SS2_Ph7_<surname>.zip 
+(again without .venv or __pycache__). Add the following files: 
+- templates/directory.html and static/js/directory.jsx (or a React project built with Vite whose 
+build output is served by Flask) 
+- docs/component-tree.png and docs/react-reflection.pdf (or .md) 
+- your demonstration video, or a link to it in README.md (see General requirements)  
+ 
+1. Add a Patient Directory link to the navbar and a Flask route that renders directory.html. 
+2. Load React 18 as shown in the hints, and keep your JSX in an external .jsx file. 
+3. Build the directory from at least five function components : PatientDirectory (the parent), 
+SearchBar, PatientTable, PatientRow and VisitHistory. Pass data and callback functions to 
+child components through props, and give every list item a unique key. 
+4. Use useState for the patients, the loading and error status, the search text, the species filter 
+and the selected patient. Searching by pet or owner name (not case -sensitive) and filtering 
+by species must update the table immediately, without extra API requests, and t he page 
+must show how many patients were found. 
+5. Use useEffect to fetch the patients once, when the directory first loads. Show a loading 
+message while waiting and an error message if the request fails. 
+6. Extend GET /api/patients to include each patient’s visitCount and lastVisit (use a SQL JOIN 
+with GROUP BY). The table must show the pet name, species and breed, the owner and phone 
+number, the number of visits and the last visit date. 
+7. Add the endpoint GET /api/patients/<id>/visits (200, or 404 if the patient does not exist). 
+When a patient is selected, VisitHistory must fetch that patient’s visits in a useEffect that 
+runs again whenever the selected patient changes, and  show them newest first. Add a 
+“Record visit” link that opens visits.html with that patient already selected (e.g. 
+/visits?patient=3); update visit-form.js to support this. 
+8. The directory must be accessible and responsive: labels for the search controls, a responsive 
+table and buttons with clear text. 
+9. docs/component-tree.png: draw your component tree, showing the props passed to each 
+component and where each piece of state is stored. 
+10. React reflection (300–400 words): (a) compare how the attendance register is updated with 
+plain JavaScript and the DOM (Phases 5–6) with how the directory is updated in React (state, 
+re-rendering and maintainability); (b) justify why each piece of state is stored in 
+PatientDirectory or in  VisitHistory; and (c) describe one problem you encountered while 
+building the directory and how you debugged it. 
+ 
+General requirements (all phases) (5 marks) 
+ 
+1. Follow the file names and folder structure given for each phase, and keep each phase in its 
+own zip file. 
+2. Include a clear README.md in the Phase 7 project. 
+3. Record a demonstration video of no more than 5 minutes (MP4 inside the Phase 7 zip file, 
+or an unlisted link in README.md). Narrate the video yourself and: register a patient 
+(including one validation error), record a visit, filter the attendance report, and use the 
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 12 of 16 
+Patient Directory. Then explain, in your own words, how one API route in app.py and one 
+React component work. 
+FORMAT 
+Zip the five zip files for Phases 3 to 7 into a single zip file named 
+WST262_S2_26_SS2_<surname_Student_no>.zip. 
+Please do not overwrite the code of one phase with that of the next phase. In other words, you 
+should submit five separate zip files inside the main zip file, each containing that phase’s version 
+of the project. 
+  
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 13 of 16 
+GUIDANCE 
+Refer to the Rubric below to understand the assignment performance expectations and how your work will be 
+assessed. Once you have completed your assessment, use the checklist below to ensure that you have 
+covered all the required elements. 
+RUBRIC 
+ 
+Criterion Max - 
+Marks 
+Excellent Good Developing Poor 
+Phase 3 
+1. Responsive layout 
+(Bootstrap grid, navbar, 
+forms, tables; 
+visits.html) 
+10 8–10 
+Bootstrap used correctly 
+on all pages; navbar 
+collapses and highlights 
+the current page; forms 
+reflow from two columns 
+to one; visits.html 
+complete; register table 
+responsive with badges; 
+Phase 2 chart still works. 
+6–7 
+Responsive on most 
+pages with minor layout 
+problems, e.g. one form 
+not reflowing or active 
+page not highlighted. 
+3–5 
+Bootstrap linked but 
+used inconsistently; 
+several pages break on a 
+phone; visits.html 
+incomplete. 
+0–2 
+Little or no responsive 
+layout; Bootstrap not 
+used or pages copied 
+with minimal adaptation. 
+2. Semantic HTML5 
+and CSS (semantic 
+elements, variables, 
+media query, 
+validation) 
+5 5 
+Correct semantic 
+structure and heading 
+order; labels, fieldset and 
+input types correct; CSS 
+variables and a working 
+media query; no inline 
+styles; W3C and 
+screenshot evidence 
+complete. 
+4 
+Mostly semantic; minor 
+validation or accessibility 
+issues; evidence mostly 
+complete. 
+2–3 
+Limited semantic 
+elements; media query 
+missing or ineffective; 
+inline styles remain; little 
+evidence. 
+0–1 
+Non-semantic markup 
+with many validation 
+errors; no evidence. 
+Phase 4 
+3. DOM events and 
+interactivity (listeners, 
+dynamic dropdown, 
+age, counter) 
+5 5 
+External scripts with 
+addEventListener only; 
+age and character 
+counter update live; 
+dropdown built from an 
+array with the DOM; 
+default and maximum 
+visit date set. 
+4 
+All features present with 
+a minor defect. 
+2–3 
+Some features missing, 
+or inline event attributes 
+used. 
+0–1 
+Little or no working 
+JavaScript interaction. 
+4. Client-side 
+validation and error 
+handling  
+10 8–10 
+Reusable rule functions 
+implement every data 
+requirement, including 
+the SA phone and future-
+date rules; clear 
+Bootstrap messages on 
+submit, blur and input; 
+focus moves to the first 
+error; try...catch and 
+textContent used; 
+debugging evidence 
+provided. 
+6–7 
+Most rules correct with 
+one or two gaps; 
+messages clear; limited 
+error handling or 
+evidence. 
+3–5 
+Only required-field 
+checks; messages unclear 
+or shown with alert(); 
+rules duplicated between 
+forms. 
+0–2 
+Validation missing or not 
+working. 
+Phase 5 
+5. Client-side storage 
+(localStorage, seed 
+data, cookie, 
+sessionStorage) 
+8 7–8 
+Clean storage functions 
+with JSON and protection 
+against corrupted data; 
+seed data loads once; 
+duplicates rejected; visits 
+linked to patients and 
+staff; cookie set correctly 
+and required; filter 
+restored from 
+sessionStorage. 
+5–6 
+Storage works, with one 
+or two requirements 
+missing or partly correct. 
+3–4 
+Data saved but not 
+reliably read back; cookie 
+or sessionStorage 
+missing. 
+0–2 
+No working client-side 
+storage. 
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 14 of 16 
+Criterion Max - 
+Marks 
+Excellent Good Developing Poor 
+6. Dynamic register 
+and chart  
+8 7–8 
+Table built with the DOM 
+from stored data, newest 
+first, with badges and a 
+summary; inclusive date 
+filter with start/end 
+check and View All; chart 
+shows monthly counts 
+including zero months 
+and is updated, not 
+recreated. 
+5–6 
+Report mostly correct; 
+minor filtering, sorting or 
+chart update issues. 
+3–4 
+Table or chart still hard-
+coded or random; filter 
+only partly works. 
+0–2 
+Report not dynamic. 
+7. Storage analysis  4 4 
+Accurate comparison; 
+each storage choice in 
+PawCare justified; at 
+least three well-argued 
+reasons why localStorage 
+is unsuitable for clinic 
+records; correctly 
+referenced. 
+3 
+Accurate comparison 
+with limited justification 
+or reasons. 
+2 
+Mostly descriptive, with 
+inaccuracies or fewer 
+than three reasons. 
+0–1 
+Missing or largely 
+incorrect. 
+Phase 6 
+8. Flask REST API and 
+database (templates, 
+schema, endpoints, 
+server validation, SQL) 
+12 10–12 
+Template inheritance 
+and url_for used; schema 
+with foreign key and set-
+up script; all endpoints 
+return correct JSON and 
+status codes; complete 
+server-side validation 
+with field errors; 
+parameterised SQL 
+throughout. 
+7–9 
+Most endpoints correct; 
+minor gaps in validation 
+or status codes. 
+4–6 
+Several endpoints 
+missing or incorrect; little 
+server validation; SQL 
+built with strings. 
+0–3 
+Flask application does 
+not run or has no 
+working API. 
+9. Front-end 
+integration with fetch  
+7 6–7 
+All data loaded and 
+saved through the API 
+with async/await; server 
+field errors shown under 
+inputs; network failures 
+and pending requests 
+handled; cookie and 
+sessionStorage still work. 
+4–5 
+API used for all data, with 
+limited error handling. 
+2–3 
+Only some pages use the 
+API; localStorage still 
+used for records. 
+0–1 
+Front end not connected 
+to the API. 
+10. Architecture, API 
+documentation and 
+testing  
+6 5–6 
+Diagram shows all four 
+components with 
+technologies and a 
+correct numbered 
+request flow; API.md 
+complete; tests include 
+failing requests with 
+evidence; README and 
+dual-validation 
+explanation clear. 
+4 
+Documentation complete 
+with minor inaccuracies. 
+2–3 
+Diagram or API 
+documentation 
+incomplete; little test 
+evidence. 
+0–1 
+Documentation missing. 
+Phase 7 
+11. React components, 
+props and state  
+10 8–10 
+At least five well-
+structured function 
+components; data and 
+callbacks passed through 
+props; state stored in the 
+right component with no 
+duplicated state; keys 
+used; search and species 
+filter work instantly; no 
+console errors. 
+6–7 
+Components and state 
+mostly correct; minor 
+issues with keys, 
+structure or filtering. 
+3–5 
+Few components; state 
+misused (e.g. props 
+changed directly); 
+filtering incomplete. 
+0–2 
+React not working or not 
+used. 
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 15 of 16 
+Criterion Max - 
+Marks 
+Excellent Good Developing Poor 
+12. Effects and API 
+integration  
+6 5–6 
+Patients fetched once 
+with loading and error 
+states; visitCount and 
+lastVisit from SQL; new 
+visits endpoint; history 
+effect depends on the 
+selected patient; Record 
+visit link pre-selects the 
+patient. 
+4 
+Most features work, with 
+a minor defect (e.g. 
+wrong effect 
+dependencies). 
+2–3 
+Data loads but history or 
+new endpoint missing. 
+0–1 
+No data fetched from the 
+API. 
+13. Component tree 
+and React reflection  
+4 4 
+Accurate tree with props 
+and state; insightful 
+comparison with the 
+DOM approach; state 
+placement justified; 
+specific debugging 
+account. 
+3 
+Complete but mostly 
+descriptive. 
+2 
+Partly complete or 
+generic. 
+0–1 
+Missing. 
+General 
+14. Project structure, 
+README and video  
+5 5 
+Correct file names and 
+folder structure with no 
+unnecessary folders; 
+clear README; video of 5 
+minutes or less shows all 
+required flows and 
+explains an API route and 
+a component in the 
+student’s own words. 
+4 
+Minor deviations; video 
+covers most 
+requirements. 
+2–3 
+Structure hard to follow; 
+README or video 
+incomplete. 
+0–1 
+No adherence to the 
+structure and no video. 
+  
+Web Systems and Technologies (WST262) / SS2 2026-09-11/01 
+Page 16 of 16 
+CHECKLIST 
+Once you have completed your assessment, use the checklist below to ensure that you have covered all 
+elements. 
+ Task/ Requirement YES NO 
+1 Did you create a zip file for Phase 3, including visits.html and the validation and screenshot 
+evidence? 
+  
+2 Did you create a zip file for Phase 4, including the debugging screenshots?   
+3 Did you create a zip file for Phase 5, including the storage analysis?   
+4 Did you create a zip file for Phase 6, including README.md, API.md, the architecture 
+diagram and API tests (without .venv or __pycache__)? 
+  
+5 Did you create a zip file for Phase 7, including the component tree and React reflection?   
+6 Did you include your demonstration video (5 minutes or less) or a link to it in 
+README.md? 
+  
+7 Does every page work with no errors in the browser Console?   
+8 Did you keep a record of all AI prompts and responses, as required by the AITLM?   
+9 Did you create a zip file named WST262_S2_26_SS2_<surname_Student_no>.zip 
+containing the five zip files above? 
+  
+ 
