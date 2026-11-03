@@ -1,0 +1,30 @@
+F1: Reflective account
+Description
+
+A major challenge arose during the vulnerability review of my application. I initially assumed that browser validation and parameterised SQL queries would prevent unsafe input from reaching the back end. During testing, however, I saw that server-side controls were also necessary. I added request validation, CSRF protection, secure headers and stricter upload checks, but one automated security test still failed because the service-worker cache version was outdated. This may sound unrelated to security, but both moments demonstrated that a working feature is not necessarily a correctly verified feature.
+
+Feelings
+
+I felt confident after implementing the main features, but the failed security test made me realise that confidence had been based too heavily on my own assumptions. During the first upload and security tests, I felt uncertain because malformed files could behave differently from ordinary form submissions. I became frustrated when a test failed despite the application appearing to work in the browser. These feelings encouraged me to slow down and examine the request, validation order and test environment rather than quickly changing the code.
+
+Evaluation
+
+The good outcome was that the final implementation included several layers of protection. I validated patient and visit values in the browser and again on the server, used SQLite placeholders instead of interpolated SQL, enforced CSRF tokens, and checked uploaded images by MIME type, extension and binary signature. The security tests also confirmed missing CSRF tokens, SQL-shaped input and invalid uploads were rejected. The weakness was that I initially trusted browser behaviour and assumed that my Flask responses would remain consistent across pages. The API documentation and security evidence then helped me identify an outdated service-worker expectation during testing.
+
+Analysis
+
+The problem happened partly because I had separated design, implementation and testing into different stages. A feature such as upload security depends on browser JavaScript, Flask routes, session handling, file storage and test configuration all behaving together. One weak assumption can affect several of these layers. I also learnt that testing a success case does not prove that an application is safe. It is necessary to test malformed data, missing tokens, unusual file names, oversized files and direct API requests. This revealed that I had been thinking of testing as a final confirmation rather than as part of the development process.
+
+The work also made accessibility and low-data use more concrete. A screen reader user is affected if labels are missing, status messages are not announced or focus is not moved to invalid fields. A resident with limited prepaid mobile data is affected by unnecessary JavaScript, uncached assets, autoplaying video or downloading large images unnecessarily. A coordinator is affected because report status and resident information must be accurate and protected. My choices therefore had consequences beyond whether the page looked complete.
+
+Conclusion
+
+I learnt that secure and usable systems require deliberate verification at each boundary: browser to server, request to database, upload to storage, and service worker to cache. CSS and HTML are not the only parts that determine usability, and security is not only visible through configuration files. Evidence such as screenshots, HTTP status codes, automated tests and Lighthouse scores makes it possible to demonstrate that a feature works rather than merely claiming that it does.
+
+I also learnt the importance of maintaining discipline when fixing a bug. Once an error appears, changing several parts without understanding the cause can create new failures. Reading the failing assertion, following the request path and checking the relevant implementation were more effective than guessing.
+
+Action plan
+
+In future projects, I will start with a small requirements and threat checklist before implementation. For each page, I will list its inputs, users, server actions, database effects and possible misuse. I will include browser, server and database validation in the initial design instead of treating them as separate tasks.
+
+I will also introduce automated tests and a browser-verification checklist from the beginning. Each feature will need success, validation, network-failure and security cases. In addition to testing on one desktop browser, I will use phone and tablet viewports, keyboard-only navigation, a screen reader where available, DevTools offline mode and a Lighthouse mobile audit. This will help me find usability and security problems earlier, protect users' information more effectively and reduce preventable retesting later.
