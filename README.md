@@ -6,6 +6,8 @@ This PawCare implementation is the equivalent clinic adaptation of the Ward 42 F
 application demonstrates Flask routing, SQLite persistence, REST JSON APIs, Bootstrap responsive layouts,
 JavaScript/React interactivity, PWA delivery, secure uploads and dashboard analytics.
 
+GitHub repository: https://github.com/FJlaker/PawCare
+
 ## Features
 
 - Register and validate animal patients with optional JPEG, PNG or WebP photos.
