@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}{{ patient.pet_name }} | PawCare{% endblock %}
+
+{% block content %}
+<section class="mb-4">
+    <a class="btn btn-outline-secondary mb-3" href="{{ url_for('directory') }}">Back to Patient Directory</a>
+    <div class="card border-0 shadow-sm rounded-3">
+        <div class="card-body p-4">
+            <div class="row g-4 align-items-start">
+                <div class="col-md-5">
+                    {% if patient.photo_path %}
+                    <img
+                        class="patient-photo-full w-100"
+                        src="{{ url_for('api_patient_photo', patient_id=patient.id) }}"
+                        alt="Full photo of {{ patient.pet_name }}"
+                    >
+                    {% else %}
+                    <div class="patient-photo-placeholder-full" role="img" aria-label="No photo available for {{ patient.pet_name }}">
+                        No photo available
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-7">
+                    <h1 class="h3">{{ patient.pet_name }}</h1>
+                    <dl class="row">
+                        <dt class="col-sm-4">Species</dt><dd class="col-sm-8">{{ patient.species }}</dd>
+                        <dt class="col-sm-4">Breed</dt><dd class="col-sm-8">{{ patient.breed or "Not specified" }}</dd>
+                        <dt class="col-sm-4">Owner</dt><dd class="col-sm-8">{{ patient.owner_name }}</dd>
+                        <dt class="col-sm-4">Email</dt><dd class="col-sm-8">{{ patient.email }}</dd>
+                        <dt class="col-sm-4">Phone</dt><dd class="col-sm-8">{{ patient.phone }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

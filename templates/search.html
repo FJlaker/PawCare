@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Fix-It Report Search</title>
+</head>
+<body>
+    <h1>Reports for {{ street }}</h1>
+    <ul>
+    {% for report in rows %}
+        <li>#{{ report.id }} {{ report.category }}: {{ report.status }}</li>
+    {% endfor %}
+    </ul>
+</body>
+</html>

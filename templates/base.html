@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#4f46e5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>{% block title %}PawCare{% endblock %}</title>
+    <link rel="manifest" href="{{ url_for('manifest') }}">
+    <link rel="icon" href="{{ url_for('static', filename='icons/pawcare-192.png') }}" type="image/png">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/pawcare-192.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-5.3.8-dist/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body class="pawcare-app">
+    <a class="skip-link visually-hidden-focusable" href="#main-content">Skip to main content</a>
+    <header class="container-fluid py-4 px-3 px-md-4">
+        <nav class="navbar navbar-expand-md navbar-light bg-white rounded-3 shadow-sm px-3 px-md-4" aria-label="Main navigation">
+            <a class="navbar-brand fw-bold text-primary" href="{{ url_for('index') }}">PawCare</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="mainNav">
+                <ul class="navbar-nav ms-auto mb-2 mb-md-0 gap-md-2 align-items-md-center">
+                    <li class="nav-item"><a class="nav-link {% if request.endpoint == 'index' %}active{% endif %}" {% if request.endpoint == 'index' %}aria-current="page"{% endif %} href="{{ url_for('index') }}">Add Patient</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.endpoint == 'visits' %}active{% endif %}" {% if request.endpoint == 'visits' %}aria-current="page"{% endif %} href="{{ url_for('visits') }}">Record Visit</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.endpoint == 'reports' %}active{% endif %}" {% if request.endpoint == 'reports' %}aria-current="page"{% endif %} href="{{ url_for('reports') }}">Attendance Reports</a></li>
+                    <li class="nav-item"><a class="nav-link {% if request.endpoint == 'directory' %}active{% endif %}" {% if request.endpoint == 'directory' %}aria-current="page"{% endif %} href="{{ url_for('directory') }}">Patient Directory</a></li>
+                    <li class="nav-item d-flex align-items-center gap-2">
+                        <span class="small text-muted" id="staffNameDisplay">Staff name not set</span>
+                        <button class="btn btn-outline-primary btn-sm" id="staffNameButton" type="button" data-bs-toggle="modal" data-bs-target="#staffNameModal">Staff name</button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main-content" class="container-fluid px-3 px-md-4 pb-4" tabindex="-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <div id="connectionStatus" class="alert alert-warning fixed-bottom mx-3 mb-3 text-center d-none" role="status" aria-live="polite">
+        You are offline. Saved records will remain safe in the clinic database and API access is paused.
+    </div>
+
+    {% include '_staff_modal.html' %}
+    <footer class="container-fluid pb-4 px-3 px-md-4">
+        <div class="text-center text-muted small">PawCare clinic administration</div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='css/bootstrap-5.3.8-dist/js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cookies.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('{{ url_for("service_worker") }}')
+                    .catch((error) => console.error('PawCare service worker registration failed:', error));
+            });
+        }
+    </script>
+    {% block page_scripts %}{% endblock %}
+</body>
+</html>

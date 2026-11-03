@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block title %}PawCare | Patient Directory{% endblock %}
+
+{% block content %}
+<section class="mb-4">
+    <div class="row align-items-center">
+        <div class="col-md-8">
+            <h1 class="mb-1">Patient Directory</h1>
+            <p class="text-muted mb-0">Search and review the PawCare patient register.</p>
+        </div>
+        <div class="col-md-4 text-md-end mt-3 mt-md-0">
+            <a class="btn btn-primary" href="{{ url_for('index') }}">Add Patient</a>
+        </div>
+    </div>
+</section>
+<div id="directory-root"></div>
+{% endblock %}
+
+{% block page_scripts %}
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel" src="{{ url_for('static', filename='js/directory.jsx') }}"></script>
+{% endblock %}

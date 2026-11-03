@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block title %}Offline - PawCare{% endblock %}
+{% block content %}
+<section class="card border-0 shadow-sm" aria-labelledby="offline-heading">
+    <div class="card-body text-center py-5">
+        <h1 id="offline-heading">You are offline</h1>
+        <p class="mb-4">PawCare cannot reach the clinic server. Previously opened pages may still be available.</p>
+        <button class="btn btn-primary" id="offlineRetry" type="button">Try again</button>
+    </div>
+</section>
+{% endblock %}
