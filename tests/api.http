@@ -1,0 +1,129 @@
+@baseUrl = http://127.0.0.1:5000
+@patientId = 1
+
+### List patients (200)
+GET {{baseUrl}}/api/patients
+Accept: application/json
+
+### Get one patient (200)
+GET {{baseUrl}}/api/patients/{{patientId}}
+Accept: application/json
+
+### Get one patient's visit history (200)
+GET {{baseUrl}}/api/patients/{{patientId}}/visits
+Accept: application/json
+
+### Get missing patient (404)
+GET {{baseUrl}}/api/patients/999999
+Accept: application/json
+
+### Get missing patient's visit history (404)
+GET {{baseUrl}}/api/patients/999999/visits
+Accept: application/json
+
+### Register patient (201)
+POST {{baseUrl}}/api/patients
+Content-Type: application/json
+
+{
+  "pet_name": "Tilly REST",
+  "species": "Rabbit",
+  "breed": "Mini Lop",
+  "dob": "2024-01-14",
+  "gender": "Female",
+  "neutered_spayed": false,
+  "owner_name": "Test Owner",
+  "email": "phase6-test@example.co.za",
+  "phone": "082 222 3344"
+}
+
+### Duplicate patient (409)
+POST {{baseUrl}}/api/patients
+Content-Type: application/json
+
+{
+  "pet_name": "Bella",
+  "species": "Dog",
+  "breed": "Labrador",
+  "dob": "2022-04-12",
+  "gender": "Female",
+  "neutered_spayed": true,
+  "owner_name": "Sarah Johnson",
+  "email": "sarah@example.com",
+  "phone": "082 123 4567"
+}
+
+### Invalid patient data (400)
+POST {{baseUrl}}/api/patients
+Content-Type: application/json
+
+{
+  "pet_name": "1",
+  "species": "Lizard",
+  "breed": "A breed name that is longer than forty characters",
+  "dob": "2099-01-01",
+  "gender": "Unknown",
+  "neutered_spayed": "maybe",
+  "owner_name": "Owner 1",
+  "email": "not-an-email",
+  "phone": "12345"
+}
+
+### Get visits (200)
+GET {{baseUrl}}/api/visits
+Accept: application/json
+
+### Get visits in a date range (200)
+GET {{baseUrl}}/api/visits?start=2026-06-01&end=2026-08-31
+Accept: application/json
+
+### Invalid visit date range (400)
+GET {{baseUrl}}/api/visits?start=2026-09-01&end=2026-06-01
+Accept: application/json
+
+### Record visit (201)
+POST {{baseUrl}}/api/visits
+Content-Type: application/json
+
+{
+  "patient_id": {{patientId}},
+  "visit_type": "Consultation",
+  "date": "2026-09-30",
+  "time": "10:30",
+  "notes": "Follow-up visit",
+  "staff_name": "Alex Morgan"
+}
+
+### Missing patient on visit (404)
+POST {{baseUrl}}/api/visits
+Content-Type: application/json
+
+{
+  "patient_id": 999999,
+  "visit_type": "Consultation",
+  "date": "2026-09-30",
+  "time": "10:30",
+  "notes": "Invalid patient reference",
+  "staff_name": "Alex Morgan"
+}
+
+### Invalid visit fields (400)
+POST {{baseUrl}}/api/visits
+Content-Type: application/json
+
+{
+  "patient_id": 1,
+  "visit_type": "Grooming",
+  "date": "2099-01-01",
+  "time": "not-a-time",
+  "notes": "",
+  "staff_name": ""
+}
+
+### Monthly visit report including empty months (200)
+GET {{baseUrl}}/api/reports/monthly?start=2026-01-01&end=2026-06-30
+Accept: application/json
+
+### Invalid monthly report range (400)
+GET {{baseUrl}}/api/reports/monthly?start=2026-10-01&end=2026-02-01
+Accept: application/json

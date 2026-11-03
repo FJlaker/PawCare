@@ -1,0 +1,63 @@
+### Attempt SQL injection through patient creation
+POST http://127.0.0.1:5000/api/patients
+Content-Type: application/json
+
+{
+  "pet_name": "X' OR 1=1--",
+  "species": "Cat",
+  "breed": "Test",
+  "dob": "2024-01-14",
+  "gender": "Female",
+  "neutered_spayed": true,
+  "owner_name": "Security Test",
+  "email": "security-test@example.com",
+  "phone": "0822223344"
+}
+
+### Attempt reflected/script content in an owner name
+POST http://127.0.0.1:5000/api/patients
+Content-Type: application/json
+X-CSRF-Token: obtain-from-GET-api-csrf-token
+
+{
+  "pet_name": "Luna",
+  "species": "Cat",
+  "breed": "Test",
+  "dob": "2024-01-14",
+  "gender": "Female",
+  "neutered_spayed": true,
+  "owner_name": "<script>alert(1)</script>",
+  "email": "security-test@example.com",
+  "phone": "0822223344"
+}
+
+### Request a CSRF token
+GET http://127.0.0.1:5000/api/csrf-token
+
+### Reject a patient-changing request with no CSRF token
+POST http://127.0.0.1:5000/api/patients
+Content-Type: application/json
+
+{
+  "pet_name": "NoCsrf",
+  "species": "Dog",
+  "breed": "Test",
+  "dob": "2024-01-14",
+  "gender": "Male",
+  "neutered_spayed": false,
+  "owner_name": "Security Test",
+  "email": "nocrsf@example.com",
+  "phone": "0822223344"
+}
+
+### Reject an invalid upload content type
+POST http://127.0.0.1:5000/api/uploads
+Content-Type: multipart/form-data; boundary=securityBoundary
+X-CSRF-Token: obtain-from-GET-api-csrf-token
+
+--securityBoundary
+Content-Disposition: form-data; name="photo"; filename="report.txt"
+Content-Type: text/plain
+
+not an image
+--securityBoundary--
